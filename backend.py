@@ -12,7 +12,7 @@ import random
 import os
 import datetime
 import warnings
-
+import sqlite3
 
 warnings.filterwarnings("ignore")
 
@@ -29,11 +29,13 @@ CURRENT_DIR = os.getcwd()
 DATA_PATH = CURRENT_DIR +'/data'
 
 def open_db_connect():
+    '''
+    connect to the database: raise exception if cannot connect
+    requires a database caleld flight_booking_system
+    CREATE DATABASE flight_booking_system;
+    '''
     try:
-        # connect to the database: raise exception if cannot connect
-        #requires a database caleld flight_booking_system
-        # CREATE DATABASE flight_booking_system;
-        #
+
         conn = pyodbc.connect('Driver={SQL Server};'
                               'Server=LAPTOP-O7O00DNK\SQLEXPRESS;'
                               'Database=flight_booking_system;'
@@ -42,6 +44,20 @@ def open_db_connect():
     except ConnectionError as exc:
         raise RuntimeError('Failed to open database') from exc
 
+def create_sqlite_db():
+    '''
+    creates a database called: "flight_booking_system.db"
+    if it does not exist sqlite.connect() will create one
+    in the folder "data".
+    Returns the connection to the database.
+    '''
+    db_name = "flight_booking_system.db"
+    db_path = os.path.join(DATA_PATH,db_name)
+    try:
+        conn = sqlite3.connect(db_path)
+        return conn
+    except sqlite3.Error as exc:
+        raise RuntimeError(f"Failed to open database {exc}") from exc
 
 def read_db_query(read_command):
     # takes in a command, opens the database, executes the command.
